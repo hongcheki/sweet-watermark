@@ -29,6 +29,7 @@ accelerate launch calculate_human_entropy.py \
 **Important**: For the exact same generation result and numbers, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
 
 As described in our paper, we generated `n_samples=40` and `20` samples for HumanEval and MBPP, respectively. `batch_size` was used to the same value as the `n_samples`.
+Additionally, we needed longer `max_length_generation=1024` for MBPP because of the 3-shot prompt.
 
 Note that we used different `hash_key` for MBPP which is `15485917`, not `15485863`(default). This was for debugging and we observed similar results when we used default hash key value. For MBPP, add `--hash_key 15485917` argument.
 
@@ -38,6 +39,7 @@ accelerate launch main.py \
     --use_auth_token \
     --task {humaneval,mbpp} \
     --batch_size {40,20} \
+    --max_length_generation {512,1024} \
     --precision bf16 \
     --allow_code_execution \
     --outputs_dir OUTPUT_DIRECTORY \
