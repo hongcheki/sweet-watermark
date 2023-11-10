@@ -26,7 +26,7 @@ accelerate launch calculate_human_entropy.py \
 ```
 
 ### 2. Generating watermarked machine-generated code, calculating pass@k and detecting watermarks
-**Important**: For exactly same reproduction number, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
+**Important**: For the exact same generation result and numbers, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
 
 As described in our paper, we generated `n_samples=40` and `20` samples for HumanEval and MBPP, respectively. `batch_size` was used to the same value as the `n_samples`.
 
@@ -69,7 +69,7 @@ accelerate launch main.py \
 ```
 
 ### 4. Calculating Metrics (AUROC, TPR)
-With both metric output files from machine-generated and human-written codes, we finally calculate metrics including AUROC and TPR and update attach the results to `EVALUATION_RESULTS_FNAME_MACHINE`.
+With both metric output files from machine-generated and human-written codes, we calculate metrics including AUROC and TPR and update the results to `EVALUATION_RESULTS_FNAME_MACHINE`.
 
 ```
 python calculate_auroc_tpr.py \
