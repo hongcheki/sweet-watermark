@@ -15,7 +15,7 @@ Official repository of the paper:
 ## Reproducing the Main Experiments
 
 ### 1. Calculating the entropy of the model for human-written code
-Please refer Sec 4.3. of our paper for details.
+Please refer to our paper for details.
 
 ```
 accelerate launch calculate_human_entropy.py \
