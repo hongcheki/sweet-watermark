@@ -25,8 +25,8 @@ accelerate launch calculate_human_entropy.py \
     --precision bf16
 ```
 
-### 2. Generating watermarked machine-generated code and Detecting watermarks
-**Important**: For rigorous reproduction, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
+### 2. Generating watermarked machine-generated code, calculating pass@k and detecting watermarks
+**Important**: For exactly same reproduction number, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
 
 As described in our paper, we generated `n_samples=40` and `20` samples for HumanEval and MBPP, respectively. `batch_size` was used to the same value as the `n_samples`.
 
