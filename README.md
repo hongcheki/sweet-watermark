@@ -3,7 +3,7 @@
 ## Introduction
 Official repository of the paper:
 
-"[Who Wrote this Code? Watermarking for Code Generation](https://arxiv.org/abs/2305.15060)" by Taehyun Lee*, Seokhee Hong*, Jaewoo Ahn, Ilgee Hong, Hwaran Lee, Sangdoo Yun, Jamin Shin', Gunhee Kim'
+"[Who Wrote this Code? Watermarking for Code Generation](https://arxiv.org/abs/2305.15060)" by [Taehyun Lee*](https://vision.snu.ac.kr/people/taehyunlee.html), [Seokhee Hong*](https://hongcheki.github.io/), [Jaewoo Ahn](https://ahnjaewoo.github.io/), [Ilgee Hong](https://ilgeehong.github.io/), [Hwaran Lee](https://hwaranlee.github.io/), [Sangdoo Yun](https://sangdooyun.github.io/), [Jamin Shin'](https://www.jayshin.xyz/), [Gunhee Kim'](https://vision.snu.ac.kr/gunhee/)
 
 <p align="center">
     <img src="./img/main_table.png" alt="main table" width="80%" height="80%"> 
