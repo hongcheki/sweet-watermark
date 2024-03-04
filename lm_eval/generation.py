@@ -7,6 +7,7 @@ from transformers import StoppingCriteria, StoppingCriteriaList, LogitsProcessor
 
 from watermark import WatermarkLogitsProcessor
 from sweet import SweetLogitsProcessor
+from exp import EXPLogitsProcessor
 from lm_eval.utils import TokenizedDataset, complete_code
 
 class EndOfFunctionCriteria(StoppingCriteria):
@@ -80,6 +81,12 @@ def parallel_generations(task, dataset, accelerator, model, tokenizer, n_tasks, 
         gen_kwargs["logits_processor"] = LogitsProcessorList(
             [sweet_processor]
         )
+    elif args.rdfw or args.srdfw:
+        exp_processor = EXPLogitsProcessor(vocab=list(tokenizer.get_vocab().values()),
+                                                        n=args.key_length,
+                                                        temperature=args.temperature, # consider the temperature here because after RDFW, the token to be generated is fixed
+                                                        top_p=args.top_p)
+        gen_kwargs["logits_processor"] = LogitsProcessorList([exp_processor])
 
     if accelerator.is_main_process:
         print(f"number of problems for this task is {n_tasks}")
@@ -100,14 +107,6 @@ def parallel_generations(task, dataset, accelerator, model, tokenizer, n_tasks, 
     ds_loader = DataLoader(ds_tokenized, batch_size=1)
     model = model.to(accelerator.device)
 
-    # OOM test
-    import torch
-    model.generate(
-        input_ids=torch.Tensor([[22]]).repeat(1, args.max_length_generation).to(torch.long).to(accelerator.device),
-        num_return_sequences=args.batch_size,
-        **gen_kwargs,
-    )
-
     ds_loader = accelerator.prepare(ds_loader)
 
     generations = complete_code(
@@ -119,6 +118,7 @@ def parallel_generations(task, dataset, accelerator, model, tokenizer, n_tasks, 
         n_tasks=n_tasks,
         batch_size=args.batch_size,
         prefix=args.prefix,
+        preprocess=True if args.exp else False,
         postprocess=args.postprocess,
         **gen_kwargs,
     )

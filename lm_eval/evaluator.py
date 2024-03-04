@@ -10,6 +10,7 @@ from lm_eval.generation import parallel_generations
 from lm_eval.utils import calculate_entropy
 from watermark import WatermarkDetector
 from sweet import SweetDetector
+from exp import EXPDetector
 import pdb
 
 _WARNING = """
@@ -165,6 +166,16 @@ class Evaluator:
                             detect_list.append(1 if detection_result['prediction'] else 0)
                             detection_results.append(detection_result)
 
+                    # EXP-edit detector
+                    elif self.args.exp:
+                        detection_result = watermark_detector.detect( # no batch
+                            generated_tokens=tokenized_text[prefix_len:],
+                            n_runs=self.args.n_runs,
+                        )
+                        if not detection_result.pop('invalid', False):
+                            detect_list.append(1 if detection_result['prediction'] else 0)
+                            detection_results.append(detection_result)
+
                     # general info
                     len_list.append(len(tokenized_text) - prefix_len)
 
@@ -240,6 +251,12 @@ class Evaluator:
                                         tokenizer=self.tokenizer,
                                         z_threshold=self.args.detection_z_threshold,
                                         entropy_threshold=self.args.entropy_threshold)
+        
+        elif self.args.exp:
+            watermark_detector = EXPDetector(vocab=list(self.tokenizer.get_vocab().values()),
+                                        n=self.args.key_length,
+                                        detection_p_threshold=self.args.detection_p_threshold,
+                                        k=self.args.block_size)
 
         if self.accelerator.is_main_process:
             if not self.args.load_generations_path:

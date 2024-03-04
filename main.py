@@ -130,10 +130,9 @@ def parse_args():
         help="Whether to use SWEET",
     )
     parser.add_argument(
-        "--hash_key",
-        type=int,
-        default=15485863,
-        help="hash key value for watermark; we used 15485917 for mbpp",
+        "--exp",
+        action="store_true",
+        help="Whether to use EXP-edit",
     )
     parser.add_argument(
         "--gamma",
@@ -152,6 +151,31 @@ def parse_args():
         type=float,
         default=0.5,
         help="Entropy threshold for SWEET",
+    )
+    parser.add_argument(
+        "--key_length",
+        type=int,
+        default=512,
+        help="key length for EXP-edit",
+    )
+
+    parser.add_argument(
+        "--block_size",
+        type=int,
+        default=None,
+        help="block size for EXP-edit",
+    )
+    parser.add_argument(
+        "--n_runs",
+        type=int,
+        default=100,
+        help="EXP-edit p-value testing",
+    )
+    parser.add_argument(
+        "--detection_p_threshold",
+        type=float,
+        default=0.1,
+        help="EXP-edit p-value threshold",
     )
     parser.add_argument(
         "--detection_z_threshold",
@@ -201,7 +225,7 @@ def main():
 
     results = {}
 
-    if args.model != "llama":
+    if args.model != "meta-llama/Llama-2":
         tokenizer = AutoTokenizer.from_pretrained(
             args.model,
             revision=args.revision,
@@ -211,7 +235,13 @@ def main():
             padding_side="right",
         )
     else:
-        tokenizer = AutoTokenizer.from_pretrained(args.model_path)
+        tokenizer = AutoTokenizer.from_pretrained(
+            args.model,
+            cache_dir=args.model_path,
+            truncation_side="left",
+            padding_side="right",
+            #use_fast=False,
+        )
     if not tokenizer.eos_token:
         if tokenizer.bos_token:
             tokenizer.eos_token = tokenizer.bos_token
@@ -239,7 +269,7 @@ def main():
             print("evaluation only mode")
 
             if args.sweet:
-                if args.model != "llama":
+                if args.model != "meta-llama/Llama-2":
                     model = AutoModelForCausalLM.from_pretrained(
                         args.model,
                         revision=args.revision,
@@ -248,9 +278,10 @@ def main():
                         use_auth_token=args.use_auth_token,
                     )
                 else:
-                    model = LlamaForCausalLM.from_pretrained(
-                        args.model_path,
-                        torch_dtype=dict_precisions["fp16"],
+                    model = AutoModelForCausalLM.from_pretrained(
+                        args.model,
+                        cache_dir=args.model_path,
+                        torch_dtype="auto",
                     )
             else:
                 model = None
@@ -261,7 +292,7 @@ def main():
     else:
         # here we generate code and save it (evaluation is optional but True by default)
         print(f"Loading tokenizer and model (in {args.precision})")
-        if args.model != "llama":
+        if args.model != "meta-llama/Llama-2":
             model = AutoModelForCausalLM.from_pretrained(
                 args.model,
                 revision=args.revision,
@@ -270,9 +301,10 @@ def main():
                 use_auth_token=args.use_auth_token,
             )
         else:
-            model = LlamaForCausalLM.from_pretrained(
-                args.model_path,
-                torch_dtype=dict_precisions["fp16"],
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model,
+                cache_dir=args.model_path,
+                torch_dtype="auto",
             )
 
         evaluator = Evaluator(accelerator, model, tokenizer, args)

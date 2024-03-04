@@ -1,5 +1,7 @@
 # sweet-watermark
 
+\*\***updated (3/4/2024)**\*\* Our paper and repo are updated: DS-1000 benchmark is included, a new baseline (EXP-edit) is included, and experiments of using surrogate model, variable renaming, and detectability@T are added.
+
 ## Introduction
 Official repository of the paper:
 
@@ -14,70 +16,34 @@ Official repository of the paper:
 
 ## Reproducing the Main Experiments
 
-### 1. Calculating the entropy of the model for human-written code
-Please refer to our paper for details.
+### 1. Generating watermarked machine-generated code, calculating pass@k and detecting watermarks
+We conducted our (main) experiments by separating them into generation and detection phases. However, anyone wanting to run both phases with a single command removes the `--generation_only` argument.
 
+For EXP-edit with a high entropy setting, please set `top_p=1.0` and `temperature=1.0`.
+
+### generation phase
 ```
-accelerate launch calculate_human_entropy.py \
-    --model bigcode/starcoder \
-    --use_auth_token \
-    --task {humaneval,mbpp} \
-    --precision bf16
-```
-
-### 2. Generating watermarked machine-generated code, calculating pass@k and detecting watermarks
-**Important**: For the exact same generation result and numbers, same `batch_size` should be used with ours. Nevertheless, we observed similar results in which SWEET outperforms baselines when different `batch_size` is used.
-
-As described in our paper, we generated `n_samples=40` and `20` samples for HumanEval and MBPP, respectively. `batch_size` was used to the same value as the `n_samples`.
-Additionally, we needed longer `max_length_generation=1024` for MBPP because of the 3-shot prompt.
-
-Note that we used different `hash_key` for MBPP which is `15485917`, not `15485863`(default). This was for debugging and we observed similar results when we used default hash key value. For MBPP, add `--hash_key 15485917` argument.
-
-```
-accelerate launch main.py \
-    --model bigcode/starcoder \
-    --use_auth_token \
-    --task {humaneval,mbpp} \
-    --batch_size {40,20} \
-    --max_length_generation {512,1024} \
-    --precision bf16 \
-    --allow_code_execution \
-    --outputs_dir OUTPUT_DIRECTORY \
-    --metric_output_path EVALUATION_RESULTS_FNAME \
-    --save_generations \
-    --save_generations_path GENERATION_RESULTS_FNAME \
-    --wllm or --sweet \
-    --gamma GAMMA \
-    --delta DELTA \
-    --entropy_threshold ENTROPY_THRESHOLD \
-    --n_samples {40,20}
+bash scripts/main/run_{MODEL}_generation.sh
 ```
 
-### 3. Detecting watermarks in human-written code
+### detection phase
 ```
-accelerate launch main.py \
-    --model bigcode/starcoder \
-    --use_auth_token \
-    --task {humaneval,mbpp} \
-    --precision bf16 \
-    --allow_code_execution \
-    --outputs_dir OUTPUT_DIRECTORY \
-    --metric_output_path EVALUATION_RESULTS_FNAME \
-    --wllm or --sweet \
-    --gamma GAMMA \
-    --delta DELTA \
-    --entropy_threshold ENTROPY_THRESHOLD \
-    --detect_human_code
+bash scripts/main/run_{MODEL}_detection.sh
+```
+
+### 2. Detecting watermarks in human-written code
+```
+bash scripts/main/run_{MODEL}_detection_human.sh
 ```
 
 ### 4. Calculating Metrics (AUROC, TPR)
-With both metric output files from machine-generated and human-written codes, we calculate metrics including AUROC and TPR and update the results to `EVALUATION_RESULTS_FNAME_MACHINE`.
+With both metric output files from machine-generated and human-written codes, we calculate metrics including AUROC and TPR and update the results to `OUTPUT_DIRECTORY`.
 
 ```
 python calculate_auroc_tpr.py \
     --task {humaneval,mbpp} \
-    --human_fname EVALUATION_RESULTS_FNAME_HUMAN \
-    --machine_fname EVALUATION_RESULTS_FNAME_MACHINE
+    --human_fname OUTPUT_DIRECTORY_HUMAN \
+    --machine_fname OUTPUT_DIRECTORY
 ```
 
 ## Acknowledgements

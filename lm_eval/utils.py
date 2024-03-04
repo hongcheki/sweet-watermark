@@ -110,6 +110,7 @@ def complete_code(
     n_tasks,
     batch_size=20,
     prefix="",
+    preprocess=False,
     postprocess=True,
     **gen_kwargs,
 ):
@@ -132,6 +133,10 @@ def complete_code(
                 gen_kwargs["stopping_criteria"][0].start_length = (
                     batch["input_len"].max().item()
                 )
+
+            if preprocess:
+                gen_kwargs["logits_processor"][0].preprocess(batch_size)
+
             generated_tokens = model.generate(
                 input_ids=batch["ids"][:, : batch["input_len"]],
                 num_return_sequences=batch_size,
