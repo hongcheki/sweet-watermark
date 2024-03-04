@@ -1,6 +1,6 @@
 # sweet-watermark
 
-\*\***updated (3/4/2024)**\*\* Our paper and repo are updated: DS-1000 benchmark is included, a new baseline (EXP-edit) is included, and experiments of using surrogate model, variable renaming, and detectability@T are added.
+\*\***updated (3/4/2024)**\*\* Our paper and repo are updated: DS-1000 benchmark is included, a new baseline (EXP-edit) is included for reproducing the main results. Experiments of using surrogate model, variable renaming, and detectability@T will be added.
 
 ## Introduction
 Official repository of the paper:
@@ -36,7 +36,7 @@ bash scripts/main/run_{MODEL}_detection.sh
 bash scripts/main/run_{MODEL}_detection_human.sh
 ```
 
-### 4. Calculating Metrics (AUROC, TPR)
+### 3. Calculating Metrics (AUROC, TPR)
 With both metric output files from machine-generated and human-written codes, we calculate metrics including AUROC and TPR and update the results to `OUTPUT_DIRECTORY`.
 
 ```
