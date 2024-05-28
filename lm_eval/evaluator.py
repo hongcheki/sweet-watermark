@@ -240,14 +240,12 @@ class Evaluator:
         if self.args.wllm:
             watermark_detector = WatermarkDetector(vocab=list(self.tokenizer.get_vocab().values()),
                                         gamma=self.args.gamma,
-                                        hash_key=self.args.hash_key,
                                         tokenizer=self.tokenizer,
                                         z_threshold=self.args.detection_z_threshold)
         
         elif self.args.sweet:
             watermark_detector = SweetDetector(vocab=list(self.tokenizer.get_vocab().values()),
                                         gamma=self.args.gamma,
-                                        hash_key=self.args.hash_key,
                                         tokenizer=self.tokenizer,
                                         z_threshold=self.args.detection_z_threshold,
                                         entropy_threshold=self.args.entropy_threshold)
